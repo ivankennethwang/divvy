@@ -270,6 +270,9 @@ final class ShortcutRecorder: NSView {
 
     var combo: KeyCombo? { didSet { needsDisplay = true } }
     var onChange: ((KeyCombo?) -> Void)?
+    /// Global hotkeys need at least one modifier (besides Shift) to avoid hijacking every keypress
+    /// system-wide; non-global shortcuts only fire while the panel is open, so a bare key is fine.
+    var allowsBareKey = false
     private(set) var isRecording = false { didSet { needsDisplay = true } }
     /// Only take focus when clicked, so opening the settings never starts recording on its own.
     private var clicked = false
@@ -362,7 +365,7 @@ final class ShortcutRecorder: NSView {
             return
         }
         let isFunctionKey = event.specialKey.map { [.f1, .f2, .f3, .f4, .f5, .f6, .f7, .f8, .f9, .f10, .f11, .f12].contains($0) } ?? false
-        guard !mods.subtracting(.shift).isEmpty || isFunctionKey, let recorded = KeyCombo(event: event) else {
+        guard !mods.subtracting(.shift).isEmpty || isFunctionKey || allowsBareKey, let recorded = KeyCombo(event: event) else {
             NSSound.beep()
             return
         }

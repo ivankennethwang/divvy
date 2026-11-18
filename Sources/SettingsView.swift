@@ -243,6 +243,7 @@ final class SettingsView: NSView {
 
         let recorder = ShortcutRecorder(frame: NSRect(x: 173, y: 239, width: 144, height: 22))
         recorder.combo = draft.hotkey
+        recorder.allowsBareKey = !draft.global
         recorder.onChange = { draft.hotkey = $0 }
         c.addSubview(recorder)
 
@@ -258,6 +259,7 @@ final class SettingsView: NSView {
         })
         c.addSubview(UI.checkbox("Global Shortcut", NSRect(x: 185, y: 9, width: 140, height: 18), on: draft.global) {
             draft.global = $0
+            recorder.allowsBareKey = !$0
         })
 
         _ = button("Cancel", x: 20, in: page, key: "\u{1b}") { [weak self] in self?.show(.shortcuts) }
